@@ -1,0 +1,152 @@
+---
+title: "Creating a template"
+description: "A step-by-step guide to creating a new GitHub Actions starter workflow template."
+---
+
+<Note>
+  At this time, only Code Scanning templates are being accepted as new contributions to this repository.
+</Note>
+
+Starter workflow templates live in category directories at the root of the repository. Each template consists of two files: a workflow YAML file and a matching `.properties.json` metadata file.
+
+## Requirements
+
+Before creating a template, your workflow must meet these requirements:
+
+- Should be as simple as is needed for the service.
+- Automation and CI workflows must not send data to any third-party service, except for the purposes of installing dependencies.
+- Automation and CI workflows cannot depend on a paid service or product.
+- Actions outside of the `actions` organization must be pinned to a specific commit SHA.
+- Less popular tools or languages may not be accepted — the onboarding UI has limited space.
+
+## Steps
+
+<Steps>
+  <Step title="Choose the right category directory">
+    Place your workflow in the directory that matches its purpose:
+
+    | Directory | Category |
+    |-----------|----------|
+    | `ci/` | Continuous integration |
+    | `deployments/` | Deployment |
+    | `automation/` | Automation |
+    | `code-scanning/` | Code Scanning or Dependency review |
+    | `pages/` | Pages |
+
+    For example, a workflow that builds and tests a Python package belongs in `ci/`.
+  </Step>
+
+  <Step title="Create the workflow YAML file">
+    Create a `.yml` file in the appropriate category directory. Use lowercase, hyphen-separated names that clearly identify the tool or framework.
+
+    ```
+    ci/my-framework.yml
+    deployments/my-platform.yml
+    code-scanning/my-scanner.yml
+    ```
+
+    Here is a minimal but complete example based on the Node.js CI template:
+
+    ```yaml ci/my-framework.yml
+    # This workflow will build and test a My Framework project.
+    # For more information see: https://docs.github.com/en/actions
+
+    name: My Framework CI
+
+    on:
+      push:
+        branches: [ $default-branch ]
+      pull_request:
+        branches: [ $default-branch ]
+
+    jobs:
+      build:
+        runs-on: ubuntu-latest
+
+        steps:
+        - uses: actions/checkout@v4
+        - name: Set up My Framework
+          uses: actions/setup-node@v4
+          with:
+            node-version: '20.x'
+        - run: npm ci
+        - run: npm test
+    ```
+
+    Use [template variables](/guides/variables) such as `$default-branch` where appropriate so the workflow adapts to each user's repository.
+  </Step>
+
+  <Step title="Create the matching properties.json file">
+    Every workflow YAML file must have a corresponding `.properties.json` file in the `properties/` subdirectory of the same category folder.
+
+    The filename must match the workflow filename (without the `.yml` extension):
+
+    ```
+    ci/my-framework.yml
+    ci/properties/my-framework.properties.json
+    ```
+
+    Here is a complete example properties file:
+
+    ```json ci/properties/my-framework.properties.json
+    {
+        "name": "My Framework CI",
+        "description": "Build and test a project using My Framework.",
+        "iconName": "my-framework",
+        "categories": ["Continuous integration", "JavaScript"]
+    }
+    ```
+
+    For deployment templates, you must also include a `creator` field:
+
+    ```json deployments/properties/my-platform.properties.json
+    {
+        "name": "Deploy to My Platform",
+        "description": "Deploy your application to My Platform.",
+        "creator": "My Platform Inc.",
+        "iconName": "my-platform",
+        "categories": ["Deployment"]
+    }
+    ```
+
+    See the [Properties reference](/guides/properties-reference) for a full description of every field.
+  </Step>
+
+  <Step title="Add an SVG icon">
+    Add an SVG file for your template to the `icons/` directory at the root of the repository. The filename must match the `iconName` value in your properties file (without the `.svg` extension).
+
+    ```
+    icons/my-framework.svg
+    ```
+
+    Only SVG format is supported. The icon should be square and recognizable at small sizes.
+
+    If no custom SVG is available, you can use an [octicon](https://primer.style/octicons/) instead by setting `iconName` to `octicon <icon-name>`:
+
+    ```json
+    {
+        "iconName": "octicon person"
+    }
+    ```
+  </Step>
+
+  <Step title="Use template variables where appropriate">
+    Template variables are substituted when a user adds the workflow to their repository. Use them to make your workflow adapt automatically to each repository's configuration.
+
+    The most common variable is `$default-branch`, which resolves to the repository's default branch (for example, `main` or `master`):
+
+    ```yaml
+    on:
+      push:
+        branches: [ $default-branch ]
+      pull_request:
+        branches: [ $default-branch ]
+    ```
+
+    See the [Template variables](/guides/variables) page for the full list of available variables.
+  </Step>
+</Steps>
+
+## Testing before publishing
+
+Use the `labels` preview mechanism to test your template before it becomes visible to all users. See [Testing templates before publishing](/guides/testing-templates) for details.

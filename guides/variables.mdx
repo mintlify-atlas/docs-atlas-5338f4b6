@@ -1,0 +1,136 @@
+---
+title: "Template variables"
+description: "Reference for template variables that are substituted when a user adds a starter workflow to their repository."
+---
+
+Template variables let your workflow adapt to each user's repository automatically. When a user selects a starter workflow from the GitHub Actions onboarding UI, GitHub substitutes these variables with values derived from their repository before committing the workflow file.
+
+You can place variables anywhere in a workflow YAML file — in branch names, cron expressions, or any other string value.
+
+## Variables
+
+### `$default-branch`
+
+Substituted with the repository's default branch name, such as `main` or `master`.
+
+Use this variable on `push` and `pull_request` triggers so the workflow runs against the correct branch automatically, without the user needing to edit the file.
+
+<CodeGroup>
+
+```yaml Template (with variable)
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+```
+
+```yaml After substitution (example)
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+```
+
+</CodeGroup>
+
+### `$protected-branches`
+
+Substituted with any protected branches configured in the repository.
+
+This is useful for security-focused workflows that should also run against branches with branch protection rules. The CodeQL template uses both `$default-branch` and `$protected-branches` together:
+
+<CodeGroup>
+
+```yaml Template (with variable)
+on:
+  push:
+    branches: [ $default-branch, $protected-branches ]
+  pull_request:
+    branches: [ $default-branch, $protected-branches ]
+```
+
+```yaml After substitution (example)
+on:
+  push:
+    branches: [ main, release ]
+  pull_request:
+    branches: [ main, release ]
+```
+
+</CodeGroup>
+
+### `$cron-daily`
+
+Substituted with a valid but randomized daily cron expression.
+
+<Tip>
+  Using `$cron-daily` distributes load across GitHub's infrastructure. If every template used a fixed expression like `0 0 * * *`, all workflows would run simultaneously at midnight. The randomized value ensures scheduled runs are spread throughout the day.
+</Tip>
+
+<CodeGroup>
+
+```yaml Template (with variable)
+on:
+  schedule:
+    - cron: $cron-daily
+```
+
+```yaml After substitution (example)
+on:
+  schedule:
+    - cron: '23 14 * * *'
+```
+
+</CodeGroup>
+
+### `$cron-weekly`
+
+Substituted with a valid but randomized weekly cron expression. Used by security-focused workflows such as CodeQL that run on a weekly schedule in addition to push and pull request events.
+
+<CodeGroup>
+
+```yaml Template (with variable)
+on:
+  schedule:
+    - cron: $cron-weekly
+```
+
+```yaml After substitution (example)
+on:
+  schedule:
+    - cron: '17 3 * * 0'
+```
+
+</CodeGroup>
+
+## Real-world example
+
+The CodeQL Advanced template (`code-scanning/codeql.yml`) uses `$default-branch`, `$protected-branches`, and a weekly cron variable together:
+
+```yaml code-scanning/codeql.yml
+on:
+  push:
+    branches: [ $default-branch, $protected-branches ]
+  pull_request:
+    branches: [ $default-branch, $protected-branches ]
+  schedule:
+    - cron: $cron-weekly
+```
+
+After substitution, a repository with `main` as its default branch and `release` as a protected branch would receive:
+
+```yaml
+on:
+  push:
+    branches: [ main, release ]
+  pull_request:
+    branches: [ main, release ]
+  schedule:
+    - cron: '17 3 * * 0'
+```
+
+## When substitution happens
+
+GitHub substitutes template variables when the user clicks to add the workflow to their repository — not when the template is authored. This means the substituted values always reflect the current state of the user's repository at the time they add the workflow.

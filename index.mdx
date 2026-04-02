@@ -1,97 +1,67 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "GitHub Actions Starter Workflows"
+description: "Accelerate your CI/CD setup with ready-to-use workflow templates for GitHub Actions."
 ---
 
-## Setting up
+GitHub Actions Starter Workflows gives you a curated library of workflow templates to get your pipelines running immediately — no research required. Open the **Actions** tab in any repository and pick a template that fits your language or platform.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Add your first workflow in under two minutes
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Workflow structure" icon="file-code" href="/workflow-structure">
+    Understand the anatomy of a starter workflow
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Continuous integration" icon="rotate" href="/categories/continuous-integration">
+    Build and test across 50+ languages and frameworks
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Deployments" icon="cloud-arrow-up" href="/categories/deployments">
+    Deploy to AWS, Azure, GCP, Kubernetes, and more
   </Card>
-</Columns>
+  <Card title="Code scanning" icon="shield-halved" href="/categories/code-scanning">
+    Integrate 80+ security and quality scanning tools
+  </Card>
+  <Card title="Automation" icon="gears" href="/categories/automation">
+    Automate issue management and repository maintenance
+  </Card>
+</CardGroup>
 
-## Create beautiful pages
+## How it works
 
-Everything you need to create world-class documentation.
+<Steps>
+  <Step title="Open the Actions tab">
+    Navigate to your GitHub repository and click the **Actions** tab. GitHub will suggest starter workflows based on your repository's detected languages and tech stack.
+  </Step>
+  <Step title="Choose a template">
+    Browse templates by category — CI, deployments, code scanning, automation, or Pages. Templates matching your stack appear prominently at the top.
+  </Step>
+  <Step title="Commit the workflow file">
+    Click **Configure** on any template to open an editor pre-filled with the workflow YAML. Review it, make any adjustments, then commit it to your repository.
+  </Step>
+  <Step title="Watch your workflow run">
+    GitHub Actions picks up the new file immediately. Your workflow triggers on the next push or pull request (or whichever events are configured in the template).
+  </Step>
+</Steps>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+## Browse by category
 
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<CardGroup cols={3}>
+  <Card title="CI" icon="rotate" href="/categories/continuous-integration">
+    Python, Node.js, Go, Java, Rust, Ruby, and more
+  </Card>
+  <Card title="Deployments" icon="cloud-arrow-up" href="/categories/deployments">
+    Azure, AWS, Google Cloud, OpenShift, Terraform
+  </Card>
+  <Card title="Code scanning" icon="shield-halved" href="/categories/code-scanning">
+    CodeQL, Snyk, SonarCloud, Semgrep, Trivy
+  </Card>
+  <Card title="Automation" icon="gears" href="/categories/automation">
+    Stale issues, greetings, labels, summaries
+  </Card>
+  <Card title="Pages" icon="globe" href="/categories/pages">
+    Jekyll, Hugo, Next.js, Gatsby, Astro, Nuxt
+  </Card>
+  <Card title="Guides" icon="book" href="/guides/creating-a-template">
+    Create and publish your own templates
+  </Card>
+</CardGroup>

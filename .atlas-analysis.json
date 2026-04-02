@@ -1,0 +1,70 @@
+{
+  "projectType": "general",
+  "projectName": "GitHub Actions Starter Workflows",
+  "projectDescription": "A curated collection of starter workflow templates that help developers quickly set up CI, deployment, automation, code scanning, and Pages workflows with GitHub Actions.",
+  "theme": "palm",
+  "primaryColor": "#848c8e",
+  "lightColor": "#11161e",
+  "darkColor": "#cfd0d2",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["introduction", "quickstart", "workflow-structure"]
+          },
+          {
+            "group": "Workflow Categories",
+            "pages": [
+              "categories/continuous-integration",
+              "categories/deployments",
+              "categories/automation",
+              "categories/code-scanning",
+              "categories/pages"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/creating-a-template",
+              "guides/properties-reference",
+              "guides/variables",
+              "guides/testing-templates"
+            ]
+          },
+          {
+            "group": "Contributing",
+            "pages": [
+              "contributing/overview",
+              "contributing/validation"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "50+ CI workflow templates covering languages like Python, Node.js, Go, Java, Rust, Ruby, and more",
+    "30+ deployment workflow templates for AWS, Azure, Google Cloud, Kubernetes, and other platforms",
+    "80+ code scanning templates integrating security tools like CodeQL, Snyk, SonarCloud, and Semgrep",
+    "Automation workflow templates for issue management, stale PR handling, and repository maintenance",
+    "Pages workflow templates for static site generators including Jekyll, Hugo, Next.js, Gatsby, and Astro",
+    "Template variable substitution system ($default-branch, $protected-branches, $cron-daily)",
+    "Preview/staging support via labels in properties.json",
+    "Structured properties.json metadata schema with name, description, iconName, categories, and creator fields"
+  ],
+  "publicApiSurface": [
+    "ci/*.yml — Continuous integration workflow templates",
+    "deployments/*.yml — Deployment workflow templates",
+    "automation/*.yml — Repository automation workflow templates",
+    "code-scanning/*.yml — Security and code scanning workflow templates",
+    "pages/*.yml — GitHub Pages deployment workflow templates",
+    "*/properties/*.properties.json — Workflow metadata and UI display configuration",
+    "icons/*.svg — SVG icons for workflow template display",
+    "$default-branch — Template variable substituted with repo default branch",
+    "$protected-branches — Template variable substituted with protected branches",
+    "$cron-daily — Template variable substituted with a random daily cron time"
+  ]
+}

@@ -1,0 +1,153 @@
+---
+title: "Properties reference"
+description: "Complete reference for every field in a starter workflow .properties.json file."
+---
+
+Every workflow template requires a `.properties.json` file in the `properties/` subdirectory of its category folder. This file provides the metadata that GitHub displays in the Actions onboarding UI when users browse available templates.
+
+For example, `ci/node.js.yml` pairs with `ci/properties/node.js.properties.json`.
+
+## Fields
+
+<ParamField body="name" type="string" required>
+  The display name shown in the GitHub Actions onboarding UI. Must be unique across the entire repository — no two templates can share the same name.
+
+  ```json
+  "name": "Node.js"
+  ```
+</ParamField>
+
+<ParamField body="description" type="string" required>
+  A short description of what the template does. Shown below the template name in the onboarding UI.
+
+  ```json
+  "description": "Build and test a Node.js project with npm."
+  ```
+</ParamField>
+
+<ParamField body="iconName" type="string" required>
+  The icon to display for the template. Accepts two formats:
+
+  - **SVG filename** (without extension): Refers to a file in the `icons/` directory at the root of the repository. For example, `"nodejs"` resolves to `icons/nodejs.svg`.
+  - **Octicon name**: Uses a GitHub [octicon](https://primer.style/octicons/) by prefixing the icon name with `octicon `. For example, `"octicon person"`.
+
+  Only SVG is supported for custom icons.
+
+  ```json
+  "iconName": "nodejs"
+  ```
+
+  ```json
+  "iconName": "octicon person"
+  ```
+</ParamField>
+
+<ParamField body="categories" type="string[]" required>
+  A list of categories that determines where the template appears in the onboarding UI. The rules are:
+
+  - The array cannot be null or empty.
+  - The **first element** must match one of the allowed categories for the folder the workflow lives in (see [Valid categories](#valid-categories) below).
+  - Additional elements can be language names from [GitHub Linguist](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml) or tech stack names from the [repo-analysis-partner](https://github.com/github-starter-workflows/repo-analysis-partner/blob/main/tech_stacks.yml). Templates that match a repository's detected language or stack are featured more prominently.
+
+  ```json
+  "categories": ["Continuous integration", "JavaScript", "npm", "React", "Angular", "Vue"]
+  ```
+</ParamField>
+
+<ParamField body="creator" type="string">
+  The name of the creator or provider shown in the onboarding UI. All workflow templates from the same author should use the same `creator` value.
+
+  **Required** for all templates in the `deployments/` folder. Optional for all other folders.
+
+  ```json
+  "creator": "Amazon Web Services"
+  ```
+</ParamField>
+
+<ParamField body="labels" type="string[]">
+  An optional array of labels that control template visibility. Set to `["preview"]` to hide the template from public view. Users can still access it by appending `?preview=true` to the new workflow URL.
+
+  Remove the `labels` field entirely to publish the template to all users.
+
+  ```json
+  "labels": ["preview"]
+  ```
+</ParamField>
+
+## Complete examples
+
+### CI template (Node.js)
+
+```json ci/properties/node.js.properties.json
+{
+    "name": "Node.js",
+    "description": "Build and test a Node.js project with npm.",
+    "iconName": "nodejs",
+    "categories": ["Continuous integration", "JavaScript", "npm", "React", "Angular", "Vue"]
+}
+```
+
+### Deployment template (AWS)
+
+```json deployments/properties/aws.properties.json
+{
+    "name": "Deploy to Amazon ECS",
+    "description": "Deploy a container to an Amazon ECS service powered by AWS Fargate or Amazon EC2.",
+    "creator": "Amazon Web Services",
+    "iconName": "aws",
+    "categories": ["Deployment", "Dockerfile"]
+}
+```
+
+## Validation schema
+
+The following JSON Schema is used by `script/validate-data/index.ts` to validate every properties file:
+
+```typescript script/validate-data/index.ts
+const propertiesSchema = {
+  type: "object",
+  properties: {
+    name: { type: "string", required: true, "minLength": 1 },
+    description: { type: "string", required: true },
+    creator: { type: "string", required: false },
+    iconName: { type: "string", required: true },
+    categories: {
+      anyOf: [
+        {
+          type: "array",
+          items: { type: "string" }
+        },
+        {
+          type: "null",
+        }
+      ],
+      required: true
+    },
+  }
+}
+```
+
+Note that while the schema permits `categories` to be `null`, the validation logic additionally checks that `categories` is not null or empty at runtime (except for `blank.yml`).
+
+## Valid categories
+
+### Folder categories
+
+The first element of `categories` must match one of these values, depending on which directory the workflow lives in:
+
+| Folder | Required first category |
+|--------|------------------------|
+| `ci/` | `Continuous integration` |
+| `deployments/` | `Deployment` |
+| `automation/` | `Automation` |
+| `code-scanning/` | `Code Scanning` or `Dependency review` |
+| `pages/` | `Pages` |
+
+### Additional categories
+
+After the required first category, you can add:
+
+- **Language categories**: Any language name from the [GitHub Linguist languages list](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml) (for example, `"JavaScript"`, `"Python"`, `"Go"`).
+- **Tech stack categories**: Any stack name from the [repo-analysis-partner tech stacks list](https://github.com/github-starter-workflows/repo-analysis-partner/blob/main/tech_stacks.yml) (for example, `"npm"`, `"React"`, `"Dockerfile"`).
+
+Templates whose categories match a repository's detected language or tech stack appear more prominently in the onboarding UI for that repository.

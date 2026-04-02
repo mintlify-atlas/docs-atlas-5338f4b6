@@ -1,0 +1,65 @@
+---
+title: "Testing templates before publishing"
+description: "Use the preview label to test a starter workflow template before it becomes visible to all users."
+---
+
+Before publishing a new template, you can hide it from public view and test it using a `preview` label. This lets you verify the workflow and its properties file look correct in the GitHub Actions onboarding UI without exposing it to all users.
+
+<Note>
+  Without the preview label, your template is visible to every user who browses the GitHub Actions onboarding UI. Always use the preview label while your template is still being tested or reviewed.
+</Note>
+
+## Steps
+
+<Steps>
+  <Step title="Add the preview label to your properties.json">
+    Open your template's `.properties.json` file and add a `labels` array containing `"preview"`:
+
+    ```json ci/properties/my-framework.properties.json
+    {
+        "name": "My Framework CI",
+        "description": "Build and test a project using My Framework.",
+        "iconName": "my-framework",
+        "categories": ["Continuous integration", "JavaScript"],
+        "labels": ["preview"]
+    }
+    ```
+
+    This hides the template from the public workflow list.
+  </Step>
+
+  <Step title="Commit and push your template">
+    Commit both the workflow YAML file and the updated properties file, then push to the repository.
+
+    ```bash
+    git add ci/my-framework.yml ci/properties/my-framework.properties.json
+    git commit -m "Add My Framework CI template (preview)"
+    git push
+    ```
+  </Step>
+
+  <Step title="View the template with the preview query parameter">
+    Navigate to the new workflow page for any repository you own, appending `?preview=true` to the URL:
+
+    ```
+    https://github.com/<owner>/<repo_name>/actions/new?preview=true
+    ```
+
+    Replace `<owner>` with your GitHub username or organization name, and `<repo_name>` with the name of a repository where you want to verify the template. Your template will appear in the list alongside other preview templates.
+  </Step>
+
+  <Step title="Remove the label to publish">
+    Once you are satisfied the template works correctly, remove the `labels` array from your properties file entirely:
+
+    ```json ci/properties/my-framework.properties.json
+    {
+        "name": "My Framework CI",
+        "description": "Build and test a project using My Framework.",
+        "iconName": "my-framework",
+        "categories": ["Continuous integration", "JavaScript"]
+    }
+    ```
+
+    Commit and push this change. The template will become visible to all users.
+  </Step>
+</Steps>

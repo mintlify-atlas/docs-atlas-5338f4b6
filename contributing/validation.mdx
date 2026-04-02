@@ -1,0 +1,179 @@
+---
+title: "Workflow validation"
+description: "How the automated validator checks every workflow template and properties file on each pull request."
+---
+
+Every pull request to this repository runs an automated validation job defined in `.github/workflows/validate-data.yaml`. The validator is a TypeScript script located at `script/validate-data/index.ts`. It checks every workflow template and its accompanying properties file against a fixed set of rules, and fails the CI run if any errors are found.
+
+## How validation runs
+
+The `Validate Data` workflow triggers on every `push` and `pull_request` event. It installs dependencies with `npm ci`, then executes the validator script with `npx ts-node-script ./index.ts` from the `script/validate-data/` directory.
+
+```yaml
+- name: Validate workflows
+  run: |
+    npm ci
+    npx ts-node-script ./index.ts
+  working-directory: ./script/validate-data
+```
+
+The script reads its configuration from `script/validate-data/settings.json`, which lists the folders to scan and the allowed first-category value for each folder.
+
+## What the validator checks
+
+The validator iterates over every `.yml` and `.yaml` file in each configured folder and applies the following checks.
+
+### 1. Valid YAML
+
+Every workflow file must parse as valid YAML without errors. The validator uses `js-yaml`'s `safeLoad` to attempt parsing. Any syntax error causes the file to fail immediately.
+
+### 2. Matching `.properties.json` file
+
+For a workflow file at `<folder>/<name>.yml`, there must be a corresponding properties file at `<folder>/properties/<name>.properties.json`. If the properties file is missing or cannot be read, the workflow fails validation.
+
+### 3. Properties schema
+
+The properties file is validated against the following JSON schema:
+
+```typescript
+const propertiesSchema = {
+  type: "object",
+  properties: {
+    name: { type: "string", required: true, "minLength": 1 },
+    description: { type: "string", required: true },
+    creator: { type: "string", required: false },
+    iconName: { type: "string", required: true },
+    categories: {
+      anyOf: [
+        {
+          type: "array",
+          items: { type: "string" }
+        },
+        {
+          type: "null",
+        }
+      ],
+      required: true
+    },
+  }
+}
+```
+
+The fields `name`, `description`, `iconName`, and `categories` are all required. `creator` is optional in the schema but is required specifically for deployment templates (see below).
+
+### 4. Unique template names
+
+The `name` field in each properties file must be unique across the entire repository. The validator tracks all names seen so far in a set and reports a duplicate if the same name appears more than once.
+
+### 5. Valid `iconName`
+
+The `iconName` field must resolve to one of two things:
+
+- **An SVG file** in the `icons/` folder at the root of the repository — for example, `"iconName": "django"` requires `icons/django.svg` to exist.
+- **An octicon reference** using the format `octicon <icon-name>` — for example, `"iconName": "octicon person"`. The icon name after `octicon ` must be non-empty.
+
+### 6. First category must match the folder
+
+Every workflow (except `blank.yml`) must have at least one entry in `categories`, and the **first** category must match the allowed value for the folder the workflow lives in. The allowed categories per folder are defined in `settings.json`:
+
+| Folder | Allowed first categories |
+|---|---|
+| `ci/` | `Continuous integration` |
+| `automation/` | `Automation` |
+| `deployments/` | `Deployment` |
+| `code-scanning/` | `Code Scanning`, `Dependency review` |
+| `pages/` | `Pages` |
+
+<Info>
+  Category matching is case-insensitive. Additional categories beyond the first — such as language or tech-stack categories — are not constrained by the validator and can be freely chosen from the [linguist languages list](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml) and the [tech stacks list](https://github.com/github-starter-workflows/repo-analysis-partner/blob/main/tech_stacks.yml).
+</Info>
+
+### 7. Deployment templates must have a `creator` field
+
+If a workflow is in the `deployments/` folder, its properties file must include a non-empty `creator` field. This field identifies the template author and is displayed in the GitHub.com onboarding UI.
+
+## Common validation errors
+
+The messages below are the exact error strings produced by the validator. Use them to diagnose why a workflow fails the CI check.
+
+<AccordionGroup>
+  <Accordion title='Workflow template name already exists'>
+    ```
+    Workflow template name "<name>" already exists
+    ```
+
+    Two or more properties files across the repository use the same `name` value. Each template name must be unique. Rename one of the conflicting templates.
+  </Accordion>
+
+  <Accordion title='No icon named X found'>
+    ```
+    No icon named <iconName> found
+    ```
+
+    The `iconName` value does not match any SVG file in `icons/` and is not a valid `octicon <name>` reference. Either add `icons/<iconName>.svg` to the repository or correct the `iconName` to use an existing icon or a valid octicon format (`octicon <icon-name>`).
+  </Accordion>
+
+  <Accordion title='Workflow categories cannot be null or empty'>
+    ```
+    Workflow categories cannot be null or empty
+    ```
+
+    The `categories` array in the properties file is missing, null, or empty. Every workflow except `blank.yml` must declare at least one category. Add the appropriate first category for the folder the workflow is in.
+  </Accordion>
+
+  <Accordion title='The first category must be one of the allowed values'>
+    ```
+    The first category in properties.json categories for workflow in <folder> folder must be one of "<allowed_categories>. Either move the workflow to an appropriate directory or change the category."
+    ```
+
+    The first entry in `categories` does not match any allowed value for that folder. Either update the first category to match the folder's allowed value (see the table above), or move the workflow file to the folder that corresponds to its intended category.
+  </Accordion>
+
+  <Accordion title="The 'creator' field must be present for deployment templates">
+    ```
+    The "creator" in properties.json must be present.
+    ```
+
+    The workflow is in the `deployments/` folder but its properties file does not include a `creator` field. Add a `creator` value that identifies the template author.
+  </Accordion>
+</AccordionGroup>
+
+## Pre-commit hook
+
+A pre-commit hook configured in `.pre-commit-config.yaml` runs `trailing-whitespace` checks on all YAML and JSON files in the workflow folders before each commit:
+
+```yaml
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+  - id: trailing-whitespace
+    files: (automation/|ci/|code-scanning/|deployments/|pages/).*(yaml|yml|json)$
+```
+
+<Tip>
+  Install pre-commit locally with `pip install pre-commit && pre-commit install` to catch trailing-whitespace errors before pushing, avoiding an easy-to-fix CI failure.
+</Tip>
+
+## Example valid `properties.json`
+
+```json
+{
+    "name": "Node.js",
+    "description": "Build and test a Node.js project with npm.",
+    "iconName": "nodejs",
+    "categories": ["Continuous integration", "JavaScript", "npm", "React", "Angular", "Vue"]
+}
+```
+
+For a deployment template, include `creator`:
+
+```json
+{
+    "name": "Deploy to Amazon ECS",
+    "description": "Deploy a container to an Amazon ECS service powered by AWS Fargate or Amazon EC2.",
+    "iconName": "aws",
+    "creator": "Amazon Web Services",
+    "categories": ["Deployment", "Dockerfile"]
+}
+```

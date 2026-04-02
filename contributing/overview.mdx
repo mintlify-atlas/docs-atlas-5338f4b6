@@ -1,0 +1,66 @@
+---
+title: "Contributing overview"
+description: "How to contribute to the GitHub Actions starter workflows repository, current contribution status, and how to get support."
+---
+
+<Warning>
+  Contributions are currently limited to Code Scanning templates only. New starter workflows for other categories are not being accepted at this time.
+</Warning>
+
+## Current contribution status
+
+**At this time, only new starter workflows for Code Scanning are being accepted.**
+
+GitHub is allocating resources toward other areas of Actions and is not accepting general contributions to this repository right now. The [GitHub public roadmap](https://github.com/orgs/github/projects/4247) is the best place to follow along for updates on features in progress.
+
+Security updates and fixes for major breaking changes will still be provided during this period.
+
+## Getting help and asking questions
+
+Questions and support requests are directed to the [Community Discussions area](https://github.com/orgs/community/discussions/categories/actions). Search existing discussions before opening a new one — your question may already be answered.
+
+## Reporting bugs
+
+High-priority bugs can be reported through [Community Discussions](https://github.com/orgs/community/discussions/categories/actions) or directly to the GitHub support team at [https://support.github.com/contact/bug-report](https://support.github.com/contact/bug-report).
+
+You are welcome to raise bugs directly in this repository as well.
+
+## Security issues
+
+Security issues must be handled according to the repository's [security.md](https://github.com/actions/starter-workflows/blob/main/security.md) policy. Do not report security vulnerabilities in public issues or discussions.
+
+## Contributor license and code of conduct
+
+Contributions to this project are [released to the public](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license) under the [project's open source license](https://github.com/actions/starter-workflows/blob/main/LICENSE).
+
+This project is released with a [Contributor Code of Conduct](https://github.com/actions/.github/blob/main/CODE_OF_CONDUCT.md). By participating, you agree to abide by its terms.
+
+## Previous contribution guidelines
+
+Before the current restrictions were put in place, new starter workflow submissions were evaluated against the following requirements. These are preserved here for historical context and will apply again if general contributions reopen.
+
+<Steps>
+  <Step title="Keep workflows simple">
+    Workflows should be as simple as is needed for the service. Avoid unnecessary complexity.
+  </Step>
+  <Step title="Consider popularity">
+    There are many programming languages and tools out there. Less popular tools or languages might not be accepted, as the UI does not scale to a very large number of workflows.
+  </Step>
+  <Step title="No third-party data transmission">
+    Automation and CI workflows must not send data to any third-party service, except for the purposes of installing dependencies.
+  </Step>
+  <Step title="No paid service dependencies">
+    Automation and CI workflows cannot depend on a paid service or product.
+  </Step>
+  <Step title="Pin external Actions to a SHA">
+    Actions outside of the `actions` organization must be pinned to a specific commit SHA rather than a mutable tag or branch ref.
+  </Step>
+</Steps>
+
+<Note>
+  These guidelines are not currently enforced for new submissions since general contributions are paused. They reflect the standards that were applied before the current restrictions.
+</Note>
+
+## Support
+
+For any questions about GitHub Actions or this repository, visit [Community Discussions](https://github.com/orgs/community/discussions/categories/actions).

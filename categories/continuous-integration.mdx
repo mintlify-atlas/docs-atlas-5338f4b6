@@ -1,0 +1,162 @@
+---
+title: "Continuous integration"
+description: "Starter workflows for building, testing, and linting your code across every supported language and ecosystem."
+---
+
+Continuous integration (CI) workflows run automatically on push and pull request events to build your code and run your test suite. The starter templates in this category give you a pre-configured workflow for your language's toolchain — package manager, test runner, and matrix of runtime versions — so you can be confident each pull request passes before it merges.
+
+<Tip>
+  GitHub suggests the most relevant templates automatically based on your
+  repository's detected language.
+</Tip>
+
+## Template reference
+
+Templates are organized by language ecosystem. Each entry links to the template file in the starter-workflows repository.
+
+### JavaScript / TypeScript
+
+| Template file | Description |
+|---|---|
+| `node.js.yml` | Build and test a Node.js project with npm across Node 18, 20, and 22 |
+| `deno.yml` | Build and test a Deno project |
+| `webpack.yml` | Bundle a JavaScript project with webpack |
+| `npm-publish.yml` | Publish a package to npm |
+| `npm-publish-github-packages.yml` | Publish a package to GitHub Packages |
+
+### Python
+
+| Template file | Description |
+|---|---|
+| `python-app.yml` | Install dependencies, lint with flake8, and test with pytest |
+| `python-package.yml` | Test a Python package across multiple Python versions |
+| `python-package-conda.yml` | Test a Python package using Conda |
+| `pylint.yml` | Lint Python code with Pylint |
+| `django.yml` | Build and test a Django application |
+| `python-publish.yml` | Publish a Python package to PyPI |
+
+### Java / JVM
+
+| Template file | Description |
+|---|---|
+| `maven.yml` | Build and test with Apache Maven |
+| `maven-publish.yml` | Publish a package to GitHub Packages with Maven |
+| `gradle.yml` | Build and test with Gradle |
+| `gradle-publish.yml` | Publish a package to GitHub Packages with Gradle |
+| `ant.yml` | Build and test with Apache Ant |
+| `scala.yml` | Build and test a Scala project with sbt |
+
+### Go, Rust, C/C++
+
+| Template file | Description |
+|---|---|
+| `go.yml` | Build and test a Go project |
+| `go-ossf-slsa3-publish.yml` | Build a Go project with SLSA level 3 provenance |
+| `rust.yml` | Build and test a Rust project with Cargo |
+| `c-cpp.yml` | Build and test a C or C++ project with CMake |
+| `cmake-single-platform.yml` | Build with CMake on a single platform |
+| `cmake-multi-platform.yml` | Build with CMake across Linux, macOS, and Windows |
+| `makefile.yml` | Build with a Makefile |
+
+### Ruby / Rails
+
+| Template file | Description |
+|---|---|
+| `ruby.yml` | Build and test a Ruby gem |
+| `rubyonrails.yml` | Build and test a Ruby on Rails application |
+| `gem-push.yml` | Push a gem to RubyGems.org |
+
+### Mobile
+
+| Template file | Description |
+|---|---|
+| `android.yml` | Build and test an Android application |
+| `ios.yml` | Build and test an iOS application with Xcode |
+| `swift.yml` | Build and test a Swift project |
+| `objective-c-xcode.yml` | Build and test an Objective-C project with Xcode |
+
+### .NET
+
+| Template file | Description |
+|---|---|
+| `dotnet.yml` | Build and test a .NET application |
+| `dotnet-desktop.yml` | Build, test, and package a WPF or WinForms desktop app |
+| `msbuild.yml` | Build a project with MSBuild |
+
+### PHP
+
+| Template file | Description |
+|---|---|
+| `php.yml` | Build and test a PHP application |
+| `laravel.yml` | Build and test a Laravel application |
+| `symfony.yml` | Build and test a Symfony application |
+
+### Other languages
+
+| Template file | Description |
+|---|---|
+| `ada.yml` | Build an Ada project |
+| `clojure.yml` | Build and test a Clojure project |
+| `crystal.yml` | Build and test a Crystal project |
+| `d.yml` | Build and test a D project |
+| `dart.yml` | Build and test a Dart project |
+| `datadog-synthetics.yml` | Run Datadog Synthetic tests |
+| `docker-image.yml` | Build a Docker image |
+| `docker-publish.yml` | Build and publish a Docker image to GitHub Container Registry |
+| `elixir.yml` | Build and test an Elixir project with Mix |
+| `erlang.yml` | Build and test an Erlang project |
+| `haskell.yml` | Build and test a Haskell project |
+| `jekyll-docker.yml` | Build a Jekyll site with Docker |
+| `r.yml` | Build and test an R package |
+| `super-linter.yml` | Lint code with GitHub Super-Linter |
+| `blank.yml` | A minimal starter workflow with no language-specific steps |
+| `generator-generic-ossf-slsa3-publish.yml` | Generic SLSA level 3 provenance generator |
+
+---
+
+## Example: Node.js CI
+
+The `node.js.yml` template runs your build and test suite across Node.js 18, 20, and 22 using a matrix strategy, caching npm dependencies between runs.
+
+<Accordion title="node.js.yml — full workflow">
+```yaml
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+```
+</Accordion>
+
+Key points in the template:
+
+- **Matrix strategy** — runs one job per Node.js version in parallel, so you catch version-specific regressions immediately.
+- **`cache: 'npm'`** — restores the npm cache between runs to keep install times short.
+- **`npm run build --if-present`** — runs the build script only when it exists, so the template works for projects without an explicit build step.
+- **`$default-branch`** — a placeholder that GitHub replaces with your repository's default branch name when you add the workflow.

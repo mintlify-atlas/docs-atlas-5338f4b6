@@ -1,80 +1,107 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Add a Node.js CI workflow to your repository using a starter workflow template."
 ---
 
-## Get started in three steps
+This guide walks you through adding the Node.js CI starter workflow to a repository. The same steps apply to any other template in the library.
 
-Get your documentation site running locally and make your first customization.
+<Steps>
+  <Step title="Open the Actions tab">
+    Navigate to your GitHub repository and click the **Actions** tab. If your repository already contains workflow files, click **New workflow** to reach the template picker.
 
-### Step 1: Set up your local environment
+    GitHub detects your repository's language and tech stack, and surfaces matching templates at the top of the list. For a Node.js project, the **Node.js** template will appear in the suggested section.
+  </Step>
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Select the Node.js template">
+    Find the **Node.js** template — described as "Build and test a Node.js project with npm" — and click **Configure**.
 
-### Step 2: Deploy your changes
+    GitHub opens an inline editor pre-filled with the workflow YAML shown below:
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    ```yaml
+    # This workflow will do a clean installation of node dependencies, cache/restore them,
+    # build the source code and run tests across different versions of node
+    # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    name: Node.js CI
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    on:
+      push:
+        branches: [ $default-branch ]
+      pull_request:
+        branches: [ $default-branch ]
 
-### Step 3: Go live
+    jobs:
+      build:
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+        runs-on: ubuntu-latest
+
+        strategy:
+          matrix:
+            node-version: [18.x, 20.x, 22.x]
+            # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+        steps:
+        - uses: actions/checkout@v4
+        - name: Use Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v4
+          with:
+            node-version: ${{ matrix.node-version }}
+            cache: 'npm'
+        - run: npm ci
+        - run: npm run build --if-present
+        - run: npm test
+    ```
+
+    <Note>
+      The `$default-branch` placeholder is not literal YAML — GitHub substitutes it with your repository's actual default branch name (typically `main` or `master`) at the moment you commit the file. You will see the resolved branch name in the committed workflow file.
+    </Note>
+  </Step>
+
+  <Step title="Understand the properties file">
+    Behind the scenes, every template has a corresponding `properties.json` file that controls what you see in the template picker UI. For the Node.js template, that file looks like this:
+
+    ```json
+    {
+        "name": "Node.js",
+        "description": "Build and test a Node.js project with npm.",
+        "iconName": "nodejs",
+        "categories": ["Continuous integration", "JavaScript", "npm", "React", "Angular", "Vue"]
+    }
+    ```
+
+    The `categories` array is what causes this template to surface when GitHub detects JavaScript, npm, React, Angular, or Vue in your repository.
+  </Step>
+
+  <Step title="Review and adjust the workflow">
+    The template runs your build and tests against Node.js versions 18, 20, and 22 in parallel using a build matrix. Before committing, consider whether you need to:
+
+    - Narrow the `node-version` matrix to only the versions your project supports.
+    - Add environment variables required by your test suite.
+    - Adjust the `npm run build --if-present` step if your project uses a different build script name.
+
+    <Tip>
+      The `--if-present` flag on `npm run build` means the step is skipped silently if your `package.json` does not define a `build` script. You do not need to remove that line for projects without a build step.
+    </Tip>
+  </Step>
+
+  <Step title="Commit the workflow file">
+    When you are satisfied with the workflow, click **Commit changes**. GitHub saves the file to `.github/workflows/node.js.yml` in your repository (on the branch you choose — typically your default branch).
+  </Step>
+
+  <Step title="Watch your first run">
+    Because the workflow triggers on `push` to your default branch, committing the file immediately queues a run. Go back to the **Actions** tab to watch it execute.
+
+    You will see three parallel jobs — one for each Node.js version in the matrix — each running `npm ci`, `npm run build`, and `npm test`. A green checkmark on all three means your project builds and passes tests on every supported Node.js version.
+  </Step>
+</Steps>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Workflow structure" icon="file-code" href="/workflow-structure">
+    Understand every field in the workflow YAML and the properties file.
+  </Card>
+  <Card title="Continuous integration" icon="rotate" href="/categories/continuous-integration">
+    Browse all CI templates for other languages and frameworks.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

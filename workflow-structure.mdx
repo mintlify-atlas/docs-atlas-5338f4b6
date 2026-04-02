@@ -1,0 +1,137 @@
+---
+title: "Workflow structure"
+description: "Learn the anatomy of a starter workflow template: the YAML workflow file, the properties.json metadata file, and the template variables GitHub substitutes at commit time."
+---
+
+Every starter workflow template is made up of exactly two files that live side by side in the repository:
+
+1. A **workflow YAML file** — the GitHub Actions workflow that gets committed to `.github/workflows/` in your repository.
+2. A **properties JSON file** — metadata that controls how the template appears in the GitHub UI template picker.
+
+For example, the Node.js CI template consists of `ci/node.js.yml` and `ci/properties/node.js.properties.json`.
+
+## The workflow YAML file
+
+Here is the complete Node.js CI workflow with annotations explaining each section:
+
+```yaml
+# This workflow will do a clean installation of node dependencies, cache/restore them,
+# build the source code and run tests across different versions of node
+
+name: Node.js CI          # (1) Display name shown in the Actions tab
+
+on:                        # (2) Events that trigger the workflow
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+
+jobs:
+  build:                   # (3) Job ID — an arbitrary identifier
+
+    runs-on: ubuntu-latest # (4) Runner environment
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]   # (5) Build matrix
+
+    steps:                 # (6) Ordered list of actions and commands
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+```
+
+### Key YAML fields
+
+**`name`**
+
+The human-readable name displayed in the **Actions** tab and in workflow run history. Set it to something descriptive so you can identify runs at a glance.
+
+**`on`**
+
+Defines which GitHub events trigger the workflow. The Node.js template triggers on `push` and `pull_request` events targeting the default branch. Other common values include `schedule` (cron-based), `workflow_dispatch` (manual trigger), and `release`.
+
+**`jobs`**
+
+A map of one or more jobs. Each job runs independently on its own runner. Jobs run in parallel by default; use `needs` to declare dependencies between them.
+
+**`runs-on`**
+
+The type of runner that executes the job. `ubuntu-latest` is the most common choice for CI. Other options include `windows-latest` and `macos-latest`.
+
+**`steps`**
+
+The ordered sequence of tasks within a job. Each step is either a `uses` reference (a reusable GitHub Action) or a `run` command (a shell command). Steps execute sequentially; a failing step stops the job unless you set `continue-on-error: true`.
+
+## The properties JSON file
+
+The Node.js properties file:
+
+```json
+{
+    "name": "Node.js",
+    "description": "Build and test a Node.js project with npm.",
+    "iconName": "nodejs",
+    "categories": ["Continuous integration", "JavaScript", "npm", "React", "Angular", "Vue"]
+}
+```
+
+### Properties fields
+
+**`name`**
+
+The display name shown in the template picker. This value must be unique within the repository.
+
+**`description`**
+
+A short description shown below the template name in the picker UI. Keep it to one sentence describing what the workflow does.
+
+**`iconName`**
+
+The icon displayed alongside the template. This can be either:
+- The filename (without extension) of an SVG file in the `icons/` directory — for example, `"nodejs"` maps to `icons/nodejs.svg`.
+- An Octicon reference in the format `"octicon <icon-name>"` — for example, `"octicon person"`.
+
+**`categories`**
+
+An array of strings that controls which repositories see this template prominently. Include at least one top-level category (such as `"Continuous integration"`) and add language or framework names that match [Linguist language detection](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml). When a user's repository matches a category value, that template is promoted to the top of the suggestions list.
+
+**`creator`**
+
+An optional field that identifies the author of the template. All templates from the same author should use the same `creator` value.
+
+## Template variables
+
+You can use the following placeholder variables in your workflow YAML. GitHub substitutes each variable with the correct value for the target repository at the moment the user commits the template.
+
+| Variable | Substituted with |
+|---|---|
+| `$default-branch` | The repository's default branch name, e.g. `main` or `master` |
+| `$protected-branches` | Any protected branches configured in the repository |
+| `$cron-daily` | A valid but randomized cron expression within a 24-hour window |
+
+Using `$default-branch` instead of hardcoding `main` ensures the workflow works correctly for repositories whose default branch is named `master`, `trunk`, or anything else.
+
+## Testing a template before publishing
+
+<Note>
+  Add a `"labels": ["preview"]` array to a template's `properties.json` to hide it from the general public while you test it. The template remains accessible to anyone who appends `?preview=true` to the new workflow page URL — for example, `https://github.com/<owner>/<repo>/actions/new?preview=true`.
+
+  ```json
+  {
+      "name": "Node.js",
+      "description": "Build and test a Node.js project with npm.",
+      "iconName": "nodejs",
+      "categories": ["Continuous integration", "JavaScript", "npm", "React", "Angular", "Vue"],
+      "labels": ["preview"]
+  }
+  ```
+
+  To publish the template to all users, remove the `"labels"` field entirely.
+</Note>

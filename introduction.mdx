@@ -1,0 +1,72 @@
+---
+title: "Introduction"
+description: "Learn what GitHub Actions Starter Workflows is, how the Actions tab surfaces templates, and how the repository is organized."
+---
+
+GitHub Actions Starter Workflows is a curated library of ready-to-use workflow files that GitHub surfaces whenever you create a new workflow in a repository. Instead of writing automation from scratch, you pick a template that matches your project's language or platform, review the generated YAML, and commit it — your pipeline is running in minutes.
+
+## How the Actions tab works
+
+When you click the **Actions** tab in any GitHub repository, GitHub inspects the repository's code using [Linguist](https://github.com/github/linguist) and detects your tech stack. It then presents a ranked list of starter workflow templates: those that match your detected languages and frameworks appear prominently at the top, while every other available template is accessible by browsing the category sections below.
+
+Each template is a plain YAML file stored in this repository alongside a small `properties.json` metadata file that supplies the display name, description, icon, and category tags shown in the GitHub UI.
+
+## Categories
+
+Templates are organized into five directories, each covering a distinct area of software delivery:
+
+| Category | Directory | What it covers |
+|---|---|---|
+| **CI** | `ci/` | Build and test workflows for 50+ languages and frameworks |
+| **Deployments** | `deployments/` | Deploy to cloud providers, container platforms, and hosting services |
+| **Automation** | `automation/` | Automate issue management, pull request labeling, and repository maintenance |
+| **Code scanning** | `code-scanning/` | Integrate security scanners and code quality tools |
+| **Pages** | `pages/` | Publish static sites with Jekyll, Hugo, Next.js, and other site generators |
+
+<CardGroup cols={2}>
+  <Card title="Continuous integration" icon="rotate" href="/categories/continuous-integration">
+    Build and test across languages including Node.js, Python, Go, Java, Ruby, and Rust.
+  </Card>
+  <Card title="Deployments" icon="cloud-arrow-up" href="/categories/deployments">
+    Deploy to AWS, Azure, Google Cloud, Kubernetes, OpenShift, and more.
+  </Card>
+  <Card title="Automation" icon="gears" href="/categories/automation">
+    Automate greetings, stale issue management, labels, and repository maintenance tasks.
+  </Card>
+  <Card title="Code scanning" icon="shield-halved" href="/categories/code-scanning">
+    Integrate CodeQL, Snyk, SonarCloud, Semgrep, Trivy, and 80+ other tools.
+  </Card>
+  <Card title="Pages" icon="globe" href="/categories/pages">
+    Publish static sites built with Jekyll, Hugo, Next.js, Gatsby, Astro, or Nuxt.
+  </Card>
+</CardGroup>
+
+## Directory structure
+
+The repository mirrors the five categories above, plus two supporting directories:
+
+```
+starter-workflows/
+├── ci/                   # Continuous integration templates
+│   └── properties/       # Metadata files for CI templates
+├── deployments/          # Deployment templates
+│   └── properties/
+├── automation/           # Automation templates
+│   └── properties/
+├── code-scanning/        # Code scanning templates
+│   └── properties/
+├── pages/                # Pages templates
+│   └── properties/
+└── icons/                # SVG icons referenced by properties files
+```
+
+Every template consists of exactly two files:
+
+- A **workflow file** (e.g., `ci/node.js.yml`) — the YAML that GitHub Actions executes.
+- A **properties file** (e.g., `ci/properties/node.js.properties.json`) — metadata that controls how the template is displayed in the GitHub UI.
+
+For example, the Node.js CI template is made up of `ci/node.js.yml` and `ci/properties/node.js.properties.json`.
+
+<Info>
+  Icons referenced by the `iconName` property in a properties file must be placed in the `icons/` directory as `.svg` files. You can also use any [Octicon](https://primer.style/octicons/) by setting `iconName` to `octicon <icon-name>`, for example `"octicon person"`.
+</Info>
